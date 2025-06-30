@@ -75,13 +75,13 @@ def text_to_lists(text,block_type):
         children = []
         for split in text_split:
             if split != "":
-                children.append(LeafNode("li", split.strip()))
+                children.append(LeafNode("li", markdown_to_html(split.strip())))
         return ParentNode("ul", children)
     if block_type == BlockType.ORDERED_LIST:
         text_split = extract_ordered_list(text)
         children = []
         for split in text_split:
-            children.append(LeafNode("li", split.strip()))
+            children.append(LeafNode("li", markdown_to_html(split.strip())))
         return ParentNode("ol", children)
     
 
@@ -94,8 +94,15 @@ def text_to_children(text, block_type):
         text = text.replace("\n", " ")
         return LeafNode("p",markdown_to_html(text))
     if block_type == BlockType.QUOTE:
-        text = text_html_strip(text, "> ")
-        return LeafNode("blockquote", markdown_to_html(text))
+        text_split = text.split(">")
+        final_text = ""
+        for txt in text_split:
+            if txt != text_split[0]:
+                if txt != text_split[-1]:
+                    final_text += f"{txt}<br />"
+                else:
+                    final_text += txt
+        return LeafNode("blockquote", markdown_to_html(final_text.strip()))
     if block_type == BlockType.ORDERED_LIST or BlockType.UNORDERED_LIST:
         return text_to_lists(text, block_type)
 
